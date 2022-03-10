@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "214527405908",
+    "project_id": "alexa-clean-the-kitchen",
+    "storage_bucket": "alexa-clean-the-kitchen.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214527405908:android:460f8ee44b185f6c5ae2c1",
+        "android_client_info": {
+          "package_name": "com.alaxa_clean_the_kitchen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214527405908-9gbah74rttdfboeovfs371tbrbspmp7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJLINoEA3qW6sYV95F2HpyNj7pb7v2qIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214527405908-9gbah74rttdfboeovfs371tbrbspmp7c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214527405908:android:60369c487f188bee5ae2c1",
+        "android_client_info": {
+          "package_name": "com.mohsno.alexa_clean_the_kitchen"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214527405908-oq93ose4evg8tv1imiffr8d9ovqbft3s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mohsno.alexa_clean_the_kitchen",
+            "certificate_hash": "ee84b26268cdf84edde2182aa2fbcd9825c44d9d"
+          }
+        },
+        {
+          "client_id": "214527405908-9gbah74rttdfboeovfs371tbrbspmp7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJLINoEA3qW6sYV95F2HpyNj7pb7v2qIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214527405908-9gbah74rttdfboeovfs371tbrbspmp7c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
