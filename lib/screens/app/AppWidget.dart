@@ -1,12 +1,11 @@
 import 'dart:developer';
+import 'dart:html';
 
 import 'package:alexa_clean_the_kitchen/models/user.dart';
 import 'package:alexa_clean_the_kitchen/services/backend.requester.dart';
 import 'package:alexa_clean_the_kitchen/styles/style.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import '../../main.dart';
 
 class AppWidget extends StatefulWidget {
@@ -25,8 +24,17 @@ class AppWidgetState extends State<AppWidget> {
   User user;
   MyHomePageState parent;
   int _page = 0;
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController userpassController = TextEditingController();
 
   AppWidgetState({@required this.parent, @required this.user});
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    userpassController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,45 +90,141 @@ class AppWidgetState extends State<AppWidget> {
           child: Flex(
             direction: Axis.vertical,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Flex(
-                      direction: Axis.vertical,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          'Hello ' + _page.toString(),
-                          textAlign: TextAlign.end,
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.font),
-                        ),
-                        Flex(
-                          direction: Axis.horizontal,
-                          children: [Text('props:'), Text('value')],
-                        ),
-                        Flex(
-                          direction: Axis.horizontal,
-                          children: [Text('props:'), Text('value')],
-                        ),
-                        Flex(
-                          direction: Axis.horizontal,
-                          textDirection: TextDirection.rtl,
-                          children: [Icon(Icons.edit)],
-                        )
-                      ]),
-                ),
-              ),
-            ],
+            children: getPage(_page),
           ),
         ));
   }
 
   _logoutUser() {
     parent.logoutUser();
+  }
+
+  List <Widget>getPage(int page) {
+    List<Widget> results;
+    switch (page) {
+      case 0:
+        results =  [
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Flex(
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Hello ' + _page.toString(),
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.font),
+                    ),
+                    Flex(
+                      direction: Axis.horizontal,
+                      children: [Text('props:'), Text('value')],
+                    ),
+                    Flex(
+                      direction: Axis.horizontal,
+                      children: [Text('props:'), Text('value')],
+                    ),
+                    Flex(
+                      direction: Axis.horizontal,
+                      textDirection: TextDirection.rtl,
+                      children: [Icon(Icons.edit)],
+                    )
+                  ]),
+            ),
+          ),
+        ];
+        break;
+      case 1:
+        results =  [
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Flex(
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Hello ' + _page.toString(),
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.font),
+                    ),
+                    Flex(
+                      direction: Axis.horizontal,
+                      children: [Text('props:'), Text('value')],
+                    ),
+                    Flex(
+                      direction: Axis.horizontal,
+                      children: [Text('props:'), Text('value')],
+                    ),
+                    Flex(
+                      direction: Axis.horizontal,
+                      textDirection: TextDirection.rtl,
+                      children: [Icon(Icons.edit)],
+                    )
+                  ]),
+            ),
+          ),
+        ];
+        break;
+      case 2:
+        results =  [
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Flex(
+                  direction: Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Get your Device credentials',
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.font),
+                    ),
+                  TextField(
+                    controller: usernameController,
+                        decoration: InputDecoration(
+                          labelText: "Xiomi user",
+                          helperText: "the email or username",
+                          helperStyle: TextStyle()
+                        ),
+                      ),
+                    TextField(
+                      controller: userpassController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                          labelText: "Password"
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+
+                        log(usernameController.text.toString());
+                        log(userpassController.text.toString());
+                      },
+                      child: const Text('Submit'),
+                    ),
+                  ],
+
+              ),
+
+            ),
+          ),
+        ];
+        break;
+
+    }
+    return results;
   }
 }

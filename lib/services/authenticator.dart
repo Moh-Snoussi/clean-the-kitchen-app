@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as dev;
 
 import 'package:alexa_clean_the_kitchen/models/user.dart';
 import 'package:alexa_clean_the_kitchen/services/backend.requester.dart';
@@ -74,11 +74,10 @@ class _LoginState extends State<LoginPage> {
       _lwaUser = await _loginWithAmazon.fetchUserProfile();
       setState(() {
         _backendUser = User.fromAmazon(_lwaUser);
-        log(_backendUser.provider);
       });
     } else {
       _lwaUser = null;
-      // TODO: show error message
+      dev.log(_backendUser.provider);
     }
   }
 
@@ -104,6 +103,7 @@ class _LoginState extends State<LoginPage> {
     try {
       await _googleSignIn.signIn();
     } catch (error) {
+      dev.log(error.toString());
       if (error is PlatformException) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("${error.message}"),
@@ -344,8 +344,8 @@ class _LoginState extends State<LoginPage> {
                           ClipboardData data = await Clipboard.getData('text/plain');
                           List<String> spliced = data.text.split(' ');
 
-                          log(spliced.toString());
-                          log(spliced.length.toString());
+                          log.info(spliced.toString());
+                          log.info(spliced.length.toString());
 
                           if (spliced.length == 3) {
                           accessTokenController.text = spliced[0];

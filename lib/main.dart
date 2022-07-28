@@ -41,7 +41,6 @@ class MyHomePageState extends State<StateHome> with TickerProviderStateMixin {
           future: _fetchCredentials(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             Widget returns = new Authenticator(parent: this);
-            log("what is this");
             log(snapshot.data.toString(), name:'future');
             if (snapshot.hasData && snapshot.data) {
                 registerPushHandler(user);
