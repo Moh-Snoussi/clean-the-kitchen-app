@@ -162,4 +162,12 @@ class User {
     validUntil = (expires.millisecondsSinceEpoch / 1000).round();
   }
 
+  bool validate() {
+    return this.accessToken != null &&
+        this.accessToken.isNotEmpty &&
+        this.refreshToken != null &&
+        this.refreshToken.isNotEmpty &&
+        this.validUntil != null;
+  }
+
 }

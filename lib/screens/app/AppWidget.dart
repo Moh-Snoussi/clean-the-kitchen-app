@@ -1,8 +1,7 @@
 import 'dart:developer';
-import 'dart:html';
-
 import 'package:alexa_clean_the_kitchen/models/user.dart';
 import 'package:alexa_clean_the_kitchen/services/backend.requester.dart';
+import 'package:alexa_clean_the_kitchen/services/token_extrator.dart';
 import 'package:alexa_clean_the_kitchen/styles/style.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +25,7 @@ class AppWidgetState extends State<AppWidget> {
   int _page = 0;
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController userpassController = TextEditingController();
+  String dropDownVal;
 
   AppWidgetState({@required this.parent, @required this.user});
 
@@ -99,11 +99,11 @@ class AppWidgetState extends State<AppWidget> {
     parent.logoutUser();
   }
 
-  List <Widget>getPage(int page) {
+  List<Widget> getPage(int page) {
     List<Widget> results;
     switch (page) {
       case 0:
-        results =  [
+        results = [
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             child: Padding(
@@ -139,7 +139,7 @@ class AppWidgetState extends State<AppWidget> {
         ];
         break;
       case 1:
-        results =  [
+        results = [
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             child: Padding(
@@ -175,55 +175,79 @@ class AppWidgetState extends State<AppWidget> {
         ];
         break;
       case 2:
-        results =  [
+        results = [
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Flex(
-                  direction: Axis.vertical,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'Get your Device credentials',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.font),
-                    ),
+                direction: Axis.vertical,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Get your Device credentials',
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.font),
+                  ),
                   TextField(
                     controller: usernameController,
-                        decoration: InputDecoration(
-                          labelText: "Xiomi user",
-                          helperText: "the email or username",
-                          helperStyle: TextStyle()
-                        ),
-                      ),
-                    TextField(
-                      controller: userpassController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          labelText: "Password"
-                      ),
+                    decoration: InputDecoration(
+                        labelText: "Xiomi user",
+                        helperText: "the email or username",
+                        helperStyle: TextStyle()),
+                  ),
+                  TextField(
+                    controller: userpassController,
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: "Password"),
+                  ),
+                  DropdownButton<String>(
+                    hint: Text("Choose a server"),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
                     ),
-                    TextButton(
-                      onPressed: () async {
+                    onChanged: (String newValue) {
+                      setState(() {
+                        dropDownVal = XiomiServer.us.toString();
+                      });
+                    },
+                    items: XiomiServer.values
+                        .map<DropdownMenuItem<String>>((dynamic value) {
+                      return DropdownMenuItem<String>(
+                        value: value.toString(),
+                        child: Text(value.toString()),
+                      );
+                    }).toList(),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      TokenExtractor extractor = TokenExtractor(XiomiUser(
+                          username: 'sooniic@live.com',//usernameController.value.text,
+                          password: '720327Sonic', // userpassController.value.text,
+                          server: XiomiServer.us));
 
-                        log(usernameController.text.toString());
-                        log(userpassController.text.toString());
-                      },
-                      child: const Text('Submit'),
-                    ),
-                  ],
+                      await extractor.login();
+                      Map devices = await extractor.geDevices();
+                      devices.forEach((key, value) {
+                        BackendRequester.
 
+                      });
+
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
               ),
-
             ),
           ),
         ];
         break;
-
     }
     return results;
   }
