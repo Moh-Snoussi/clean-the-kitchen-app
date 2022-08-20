@@ -24,47 +24,56 @@ class TokenRequester {
   final validUntilController = TextEditingController();
   final clientIdController = TextEditingController();
   final secretController = TextEditingController();
+  bool _isLoading = false;
+
+  setLoading(bool loadingState) {}
 
   tokenWidget() {
     return Container(
       color: AppColors.background,
       padding: const EdgeInsets.only(top: 25.0),
       child: ListView(
+        scrollDirection: Axis.vertical,
         children: [
+          if (parent.isLoading)
+            Expanded(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [LinearProgressIndicator(color: Colors.blue)])),
           if (!parent.backendUser.emailVerified)
-              Row(
-                children: [
-                  Container(
-                    height: 70,
-                    width: 70,
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(50))),
-                      color: Colors.orange.shade300,
-                      child: IconButton(
-                        icon: Icon(Icons.verified_user_outlined, size: 30),
-                       onPressed: () => _checkVerification(),
-                      ),
+            Row(
+              children: [
+                Container(
+                  height: 70,
+                  width: 70,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                    color: Colors.orange.shade300,
+                    child: IconButton(
+                      icon: Icon(Icons.verified_user_outlined, size: 30),
+                      onPressed: () => _checkVerification(),
                     ),
                   ),
-                  Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              child: Text(
-                                'Please verify your email: ' +
-                                    parent.backendUser.userEmail,
-                                style: (TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ))
-                ],
-              ),
+                ),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        child: Text(
+                          'Please verify your email: ' +
+                              parent.backendUser.userEmail,
+                          style: (TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ))
+              ],
+            ),
           Row(
             children: [
               Container(
@@ -82,21 +91,21 @@ class TokenRequester {
               ),
               Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          child: Text(
-                            'one more step is required:' +
-                                parent.backendUser.provider +
-                                ', one more step is required:',
-                            style: (TextStyle(fontWeight: FontWeight.bold)),
-                          ),
-                        ),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      child: Text(
+                        'one more step is required:' +
+                            parent.backendUser.provider +
+                            ', one more step is required:',
+                        style: (TextStyle(fontWeight: FontWeight.bold)),
                       ),
-                    ],
-                  ))
+                    ),
+                  ),
+                ],
+              ))
             ],
           ),
           Row(
@@ -116,36 +125,36 @@ class TokenRequester {
               ),
               Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          child: new RichText(
-                              text: new TextSpan(children: [
-                                new TextSpan(
-                                  text: 'Login at:',
-                                  style: new TextStyle(color: Colors.black),
-                                ),
-                                new TextSpan(
-                                  text: ' alexa-clean-the-kitchen.de',
-                                  style: new TextStyle(color: Colors.blue),
-                                  recognizer: new TapGestureRecognizer()
-                                    ..onTap = () {
-                                      launch('http://' +
-                                          BackendRequester.backendUrl +
-                                          '/login?appRequest=key');
-                                    },
-                                ),
-                                new TextSpan(
-                                  text: ', and import the following values:',
-                                  style: new TextStyle(color: Colors.black),
-                                ),
-                              ])),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      child: new RichText(
+                          text: new TextSpan(children: [
+                        new TextSpan(
+                          text: 'Login at:',
+                          style: new TextStyle(color: Colors.black),
                         ),
-                      ),
-                    ],
-                  ))
+                        new TextSpan(
+                          text: ' alexa-clean-the-kitchen.de',
+                          style: new TextStyle(color: Colors.blue),
+                          recognizer: new TapGestureRecognizer()
+                            ..onTap = () {
+                              launch('http://' +
+                                  BackendRequester.backendUrl +
+                                  '/login?appRequest=key');
+                            },
+                        ),
+                        new TextSpan(
+                          text: ', and import the following values:',
+                          style: new TextStyle(color: Colors.black),
+                        ),
+                      ])),
+                    ),
+                  ),
+                ],
+              ))
             ],
           ),
           Card(
@@ -188,13 +197,12 @@ class TokenRequester {
                   direction: Axis.horizontal,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-
                     Container(
                       transform: Matrix4.translationValues(0, 45, 0),
                       //alignment: Alignment(0, 0.9),
                       margin: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
                       child: MaterialButton(
-                        height: 60,
+                        height: 100,
                         onPressed: () async {
                           parent.setState(() {
                             parent.authenticationFailed = false;
@@ -215,29 +223,36 @@ class TokenRequester {
                       //alignment: Alignment(0, 0.9),
                       margin: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
                       child: MaterialButton(
-                        height: 60,
+                        height: 100,
                         onPressed: () async {
-                          ClipboardData data =
-                          await Clipboard.getData('text/plain');
+                          try {
+                            ClipboardData data =
+                                await Clipboard.getData('text/plain');
 
-                          List<String> spliced = data.text.split(' ');
+                            List<String> spliced = data.text.split(' ');
 
-                          if (spliced.length == 5) {
-                            accessTokenController.text = spliced[0];
-                            refreshTokenController.text = spliced[1];
-                            clientIdController.text = spliced[2];
-                            secretController.text = spliced[3];
-                            validUntilController.text = spliced[4];
+                            if (spliced.length == 5) {
+                              accessTokenController.text = spliced[0];
+                              refreshTokenController.text = spliced[1];
+                              clientIdController.text = spliced[2];
+                              secretController.text = spliced[3];
+                              validUntilController.text = spliced[4];
 
-                            parent.backendUser.accessToken = spliced[0];
-                            parent.backendUser.refreshToken = spliced[1];
-                            parent.backendUser.clientId = spliced[2];
-                            parent.backendUser.secret = spliced[3];
-                            parent.backendUser.validUntil = int.parse(spliced[4].toString());
-                            log(parent.backendUser.secret, name: 'secret_pasted');
-                            log(parent.backendUser.accessToken, name: 'access_pasted');
+                              parent.backendUser.accessToken = spliced[0];
+                              parent.backendUser.refreshToken = spliced[1];
+                              parent.backendUser.clientId = spliced[2];
+                              parent.backendUser.secret = spliced[3];
+                              parent.backendUser.validUntil =
+                                  int.parse(spliced[4].toString());
+                              log(parent.backendUser.secret,
+                                  name: 'secret_pasted');
+                              log(parent.backendUser.accessToken,
+                                  name: 'access_pasted');
 
-                            parent.authenticate();
+                              parent.authenticate();
+                            }
+                          } catch (e) {
+                            print(e.toString());
                           }
                         },
                         color: AppColors.primary,
@@ -266,14 +281,14 @@ class TokenRequester {
                   alignment: Alignment.center,
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero,
-                      ))),
+                    borderRadius: BorderRadius.zero,
+                  ))),
               icon: FaIcon(FontAwesomeIcons.key),
-              onPressed: ()
-              {
+              onPressed: () {
                 parent.backendUser.accessToken = accessTokenController.text;
                 parent.backendUser.refreshToken = refreshTokenController.text;
-                parent.backendUser.validUntil = int.parse(validUntilController.text);
+                parent.backendUser.validUntil =
+                    int.parse(validUntilController.text);
                 parent.backendUser.secret = secretController.text;
                 parent.backendUser.clientId = clientIdController.text;
                 parent.authenticate();
@@ -285,15 +300,13 @@ class TokenRequester {
     );
   }
 
-  _checkVerification() async
-    {
-      bool isVerified = await BackendRequester.isEmailVerified(parent.backendUser.userId);
-      if (isVerified) {
-        parent.setState(() {
-          parent.backendUser.emailVerified = true;
-        });
-
+  _checkVerification() async {
+    bool isVerified =
+        await BackendRequester.isEmailVerified(parent.backendUser.userId);
+    if (isVerified) {
+      parent.setState(() {
+        parent.backendUser.emailVerified = true;
+      });
     }
   }
-
 }

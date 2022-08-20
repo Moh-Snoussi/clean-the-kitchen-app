@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:alexa_clean_the_kitchen/models/user.dart';
+import 'package:alexa_clean_the_kitchen/services/device.request.dart';
 import 'package:alexa_clean_the_kitchen/services/token_extrator.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,7 +10,7 @@ class BackendRequester {
 
   static const String auth_v2_path = '/oauth/v2/token';
 
-  static const String backendUrl = 'www.alexa-clean-the-kitchen.de';
+  static const String backendUrl = '192.168.2.34:8000';
 
   // '192.168.2.108:7000'; //'www.alexa-clean-the-kitchen.de';
   static final String apiBase = '/api/';
@@ -38,7 +39,7 @@ class BackendRequester {
   static registerPushClient(User user) async {
     await http
         .get(
-        Uri.https(backendUrl, apiBase + 'push_subscriber',
+        Uri.http(backendUrl, apiBase + 'push_subscriber',
             {'mobileId': user.mobileId}),
         headers: generateAuthHeaders(user.accessToken))
         .then((value) => {log(value.body.toString())});
@@ -66,7 +67,7 @@ class BackendRequester {
 
   static _refreshUserToken(User user) async {
     log(user.refreshToken, name: 'refreshToken');
-    return await http.post(Uri.https(backendUrl, auth_v2_path),
+    return await http.post(Uri.http(backendUrl, auth_v2_path),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
         }, body: {
@@ -79,7 +80,7 @@ class BackendRequester {
 
   void sendPush() {
     // http.url
-    //     .get(Uri.https(backendUrl, 'test'))
+    //     .get(Uri.http(backendUrl, 'test'))
     //     .then((http.Response value) => {log(value.body.toString())});
   }
 
@@ -87,7 +88,7 @@ class BackendRequester {
     assert(user.validate(), 'Tokens are not valid');
 
     http.Response response = await http
-        .get(Uri.https(backendUrl, apiBase + 'validate'),
+        .get(Uri.http(backendUrl, apiBase + 'validate'),
         headers: generateAuthHeaders(user.accessToken));
 
     Map<String, dynamic> jsonBody = jsonDecode(response.body.toString());
@@ -103,7 +104,7 @@ class BackendRequester {
     Map<String, String> body = {'email': email, 'password': password};
 
     String targetPath = currentAction == 'Register' ? 'register' : 'login';
-    http.Response response = await http.post(Uri.https(backendUrl, targetPath),
+    http.Response response = await http.post(Uri.http(backendUrl, targetPath),
         headers: headers,
         body: jsonEncode(body));
     return jsonDecode(response.body);
@@ -112,7 +113,7 @@ class BackendRequester {
   static Future<bool> isEmailVerified(int userId) async {
     String path = 'is_verified/' + userId.toString();
 
-    http.Response response = await http.get(Uri.https(backendUrl, path),
+    http.Response response = await http.get(Uri.http(backendUrl, path),
         headers: headers);
 
     Map<String, dynamic> jsonBody = jsonDecode(response.body.toString());
@@ -122,7 +123,7 @@ class BackendRequester {
   static Future<Map<String, dynamic>> registerUser(User user) async {
     String path = '/app/authenticator';
 
-    http.Response response = await http.post(Uri.https(backendUrl, path),
+    http.Response response = await http.post(Uri.http(backendUrl, path),
         headers: {
           'Accept': 'application/json'
         }, body: {
@@ -137,20 +138,103 @@ class BackendRequester {
     return jsonBody;
   }
 
-  static registerDevices(List<XiomiDevice> devices, User user) async {
+  static Future<Map> registerDevices(List<XiomiDevice> devices, User user) async {
     if (user.validate()) {
       http.Response response = await http
-          .post(Uri.https(backendUrl, apiBase + 'addDevices'),
-          body: {
-            "devices": [devices.forEach((device) => device.asJson)]
-          },
+          .post(Uri.http(backendUrl, apiBase + 'sync/device'),
+          body: jsonEncode({
+            "devices": [...devices.map((element) => element.asJson)]
+          }),
           headers: {
           ...generateAuthHeaders(user.accessToken)
           });
+      return json.decode(response.body);
     }
+    return null;
   }
 
-  static void logOnBackend(data) {
-    http.get(Uri.https(backendUrl, 'logger', data));
+  static void logOnBackend(Command command, User user) {
+    http.post(Uri.http(backendUrl, apiBase + 'log_device'),
+        body: command.toJson(), headers: generateAuthHeaders(user.accessToken));
+  }
+
+  static Future<Map>changeDeviceName(User user, XiomiDevice selectedDevice, String newName) async {
+
+    if (user.validate()) {
+      http.Response response = await http
+          .post(Uri.http(backendUrl, apiBase + 'device/rename'),
+          body: jsonEncode({
+            "device": selectedDevice.toJson(),
+            "newName": newName
+          }),
+          headers: {
+            ...generateAuthHeaders(user.accessToken)
+          });
+      return json.decode(response.body);
+    }
+    return null;
+  }
+
+  static Future<List<XiomiDevice>>getDevices(User user) async {
+    List<XiomiDevice> results;
+    if (user.validate()) {
+      http.Response response = await http
+          .get(Uri.http(backendUrl, apiBase + 'devices'),
+          headers: {
+            ...generateAuthHeaders(user.accessToken)
+          });
+
+      Map jsonBody = jsonDecode(response.body);
+
+      if (jsonBody["success"] && jsonBody.containsKey("devices") && jsonBody["devices"] is Map && jsonBody["devices"].keys.toList().length > 0) {
+        results = XiomiDevice.fromAssociativeMap(jsonBody["devices"]);
+      }
+    }
+    return results;
+  }
+
+  static Future<Map> addRelative(User user, String deviceMac, String relatedUserEmail) async {
+    if (user.validate()) {
+      http.Response response = await http
+          .post(Uri.http(backendUrl, apiBase + 'relatives'),
+          body: jsonEncode({
+            "email": relatedUserEmail,
+            "deviceMac": deviceMac
+          }),
+          headers: {
+            ...generateAuthHeaders(user.accessToken)
+          });
+      return json.decode(response.body);
+    }
+    return null;
+  }
+
+  static Future<Map> removeRelative(User user, String deviceMac, String relatedUserEmail) async {
+    if (user.validate()) {
+      http.Response response = await http
+          .post(Uri.http(backendUrl, apiBase + 'remove_relatives'),
+          body: jsonEncode({
+            "email": relatedUserEmail,
+            "deviceMac": deviceMac
+          }),
+          headers: {
+            ...generateAuthHeaders(user.accessToken)
+          });
+      return json.decode(response.body);
+    }
+    return null;
+  }
+
+  static void securePost(User user, Map params, String apiPath) async {
+    if (user.validate()) {
+      http.Response response = await http
+          .post(Uri.http(backendUrl, apiBase + apiPath),
+          body: jsonEncode(params),
+          headers: {
+            ...generateAuthHeaders(user.accessToken)
+          });
+      return json.decode(response.body);
+    }
+    return null;
   }
 }

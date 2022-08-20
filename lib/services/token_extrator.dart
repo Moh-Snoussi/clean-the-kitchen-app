@@ -13,25 +13,11 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:simple_rc4/simple_rc4.dart';
 import 'package:randombytes/randombytes.dart';
 
-
-enum XiomiServer {
-  cn,
-  de,
-  us,
-  ru,
-  tw,
-  sg,
-  i2,
-  emptyX,
-  String
-}
+enum XiomiServer { cn, de, us, ru, tw, sg, i2, emptyX, String }
 
 extension ParseToString on XiomiServer {
   String toShortString() {
-    return this
-        .toString()
-        .split('.')
-        .last;
+    return this.toString().split('.').last;
   }
 }
 
@@ -40,9 +26,81 @@ Map xiomiResToJson(Response response) {
 }
 
 class XiomiDevice {
+  var id;
+  var extra;
+  var longitude;
+
+  var permitLevel;
+
+  var reset_flag;
+
+  var desc;
+
+  var rssi;
+
+  var ssid;
+
+  var pid;
+
+  var p2p_id;
+
+  var uid;
+
+  var latitude;
+
+  var password;
+
+  var family_id;
+
+  var parent_id;
+
+  var show_mode;
+
+  var bssid;
+
+  var shareFlag;
+
+  var isOnline;
+
+  var pd_id;
+
+  var parent_model;
+
+  var adminFlag;
+
+  List<dynamic> relativeEmails = [];
 
   XiomiDevice(
-      {this.name, this.token, this.mac, this.did, this.model, this.localIp, this.asJson });
+      {this.id,
+      this.name,
+      this.token,
+      this.mac,
+      this.did,
+      this.model,
+      this.localIp,
+      this.asJson,
+      this.longitude,
+      this.latitude,
+      this.pid,
+      this.reset_flag,
+      this.family_id,
+      this.rssi,
+      this.p2p_id,
+      this.password,
+      this.pd_id,
+      this.uid,
+      this.extra,
+      this.desc,
+      this.isOnline,
+      this.permitLevel,
+      this.shareFlag,
+      this.adminFlag,
+      this.show_mode,
+      this.parent_model,
+      this.parent_id,
+      this.bssid,
+      this.ssid,
+      this.relativeEmails});
 
   String localIp;
   String token;
@@ -50,28 +108,16 @@ class XiomiDevice {
   String mac;
   String did;
   String model;
-  Map <String, dynamic> asJson;
+  Map<String, dynamic> asJson;
 
   static List<XiomiDevice> fromXiomiResponseBody(String body) {
-    List<XiomiDevice> results;
+    List<XiomiDevice> results = [];
     Map<String, dynamic> responseBody = json.decode(body);
-    if (responseBody.isNotEmpty && responseBody.containsKey("result") &&
+    if (responseBody.isNotEmpty &&
+        responseBody.containsKey("result") &&
         responseBody["result"].containsKey("list")) {
       List resultList = responseBody["result"]["list"];
-      resultList.forEach((element) {
-        results.add(
-            XiomiDevice(
-              name: responseBody["name"],
-              localIp: responseBody["localip"],
-              token: responseBody["token"],
-              model: responseBody["model"],
-              mac: responseBody["mac"],
-              did: responseBody["did"],
-              asJson: responseBody
-            )
-        );
-
-      });
+      results = XiomiDevice.fromListMaps(resultList);
     }
     return results;
   }
@@ -80,9 +126,88 @@ class XiomiDevice {
     return {
       "did": this.did,
       "mac": this.mac,
+      "id": this.id,
+      "token": this.token,
+      "name": this.name,
+      "ipAddress": this.localIp,
     };
   }
 
+  static List<XiomiDevice> fromAssociativeMap(Map resultMap) {
+    List<XiomiDevice> results = [];
+    resultMap.keys.forEach((key) {
+      [resultMap[key]].forEach((element) {
+        results.add(XiomiDevice(
+            id: element["id"].toString() ?? "",
+            name: element["name"] ?? "",
+            localIp: element["ipAddress"] ?? "",
+            token: element["token"] ?? "",
+            model: element["device"]["model"] ?? "",
+            mac: element["mac"] ?? "",
+            did: element["did"] ?? "",
+            longitude: element["longitude"] ?? "",
+            latitude: element["latitude"] ?? "",
+            pid: element["pid"] ?? "",
+            ssid: element["ssid"] ?? "",
+            bssid: element["bssid"] ?? "",
+            parent_id: element["parent_id"] ?? "",
+            parent_model: element["parent_model"] ?? "",
+            show_mode: element["show_mode"] ?? "",
+            adminFlag: element["adminFlag"] ?? "",
+            shareFlag: element["shareFlag"] ?? "",
+            permitLevel: element["permitLevel"] ?? "",
+            isOnline: element["isOnline"] ?? "",
+            desc: element["desc"] ?? "",
+            extra: element["extra"] ?? "",
+            uid: element["uid"] ?? "",
+            pd_id: element["pd_id"] ?? "",
+            password: element["password"] ?? "",
+            p2p_id: element["p2p_id"] ?? "",
+            rssi: element["rssi"] ?? "",
+            family_id: element["family_id"] ?? "",
+            reset_flag: element["reset_flag"] ?? "",
+            relativeEmails: element["relatedUsers"] ?? [],
+            asJson: element));
+      });
+    });
+    return results;
+  }
+
+  static List<XiomiDevice> fromListMaps(List resultList) {
+    List<XiomiDevice> results;
+    resultList.forEach((element) {
+      results.add(XiomiDevice(
+          name: element["name"],
+          localIp: element["localip"],
+          token: element["token"],
+          model: element["model"],
+          mac: element["mac"],
+          did: element["did"],
+          longitude: element["longitude"],
+          latitude: element["latitude"],
+          pid: element["pid"],
+          ssid: element["ssid"],
+          bssid: element["bssid"],
+          parent_id: element["parent_id"],
+          parent_model: element["parent_model"],
+          show_mode: element["show_mode"],
+          adminFlag: element["adminFlag"],
+          shareFlag: element["shareFlag"],
+          permitLevel: element["permitLevel"],
+          isOnline: element["isOnline"],
+          desc: element["desc"],
+          extra: element["extra"],
+          uid: element["uid"],
+          pd_id: element["pd_id"],
+          password: element["password"],
+          p2p_id: element["p2p_id"],
+          rssi: element["rssi"],
+          family_id: element["family_id"],
+          reset_flag: element["reset_flag"],
+          asJson: element));
+    });
+    return results;
+  }
 }
 
 class XiomiUser {
@@ -107,14 +232,15 @@ class XiomiSecurity {
   String notificationUrl;
   String serviceToken;
 
-  XiomiSecurity({this.ssecurity,
-    this.userId,
-    this.cUserId,
-    this.passToken,
-    this.location,
-    this.code,
-    this.notificationUrl,
-    this.serviceToken});
+  XiomiSecurity(
+      {this.ssecurity,
+      this.userId,
+      this.cUserId,
+      this.passToken,
+      this.location,
+      this.code,
+      this.notificationUrl,
+      this.serviceToken});
 
   factory XiomiSecurity.fromResponse(Response response) {
     Map jsonResponse = xiomiResToJson(response);
@@ -150,7 +276,7 @@ class TokenExtractor {
   String _agentId;
   String _sign;
   XiomiSecurity xiomiSecurity;
-  String feedback;
+  String feedback = "";
   String serviceToken;
   CookieJar cookieJar;
   String deviceId;
@@ -191,28 +317,28 @@ class TokenExtractor {
     }
 
     httpClient.interceptors.add(dioLoggerInterceptor);
-    this.httpClient.interceptors.add(InterceptorsWrapper(
-        onResponse: (response, handler) {
+    this
+        .httpClient
+        .interceptors
+        .add(InterceptorsWrapper(onResponse: (response, handler) {
           response.data =
               response.data.toString().replaceAll("&&&START&&&", "");
           handler.next(response);
-        },
-        onError: (DioError e, handler) {
+        }, onError: (DioError e, handler) {
           // Do something with response error
           return handler.next(e); //continue
           // If you want to resolve the request with some custom data，
           // you can resolve a `Response` object eg: `handler.resolve(response)`.
-        }
-    ));
+        }));
   }
 
   String stringifyCookies(Map<String, String> cookies) =>
       cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
 
   Future<Response> login1Request() async {
-    return await httpClient.get(
-        loginStep1Url, options: Options(
-        headers: getRequestHeaders(), responseType: ResponseType.plain));
+    return await httpClient.get(loginStep1Url,
+        options: Options(
+            headers: getRequestHeaders(), responseType: ResponseType.plain));
   }
 
   Future<bool> loginStep1() async {
@@ -251,8 +377,8 @@ class TokenExtractor {
       "_sign": _sign,
       "_json": "true"
     };
-    return await httpClient.post(loginStep2Url, data: postBody,
-        options: Options(responseType: ResponseType.plain));
+    return await httpClient.post(loginStep2Url,
+        data: postBody, options: Options(responseType: ResponseType.plain));
   }
 
   bool validateLogin2(Response response) {
@@ -273,9 +399,9 @@ class TokenExtractor {
   }
 
   Future<Response> login3Response() {
-    return httpClient.get(
-        xiomiSecurity.location, options: Options(
-        headers: getRequestHeaders(), responseType: ResponseType.plain));
+    return httpClient.get(xiomiSecurity.location,
+        options: Options(
+            headers: getRequestHeaders(), responseType: ResponseType.plain));
   }
 
   bool validateLogin3(Response response) => response.statusCode == 200;
@@ -295,15 +421,14 @@ class TokenExtractor {
     String serviceTokenNeedle = "serviceToken=";
     response.headers["set-cookie"].forEach((element) {
       if (element.toString().startsWith(serviceTokenNeedle)) {
-        xiomiSecurity.serviceToken =
-            element.toString().substring(
-                element.indexOf("=") + 1, element.indexOf(";"));
+        xiomiSecurity.serviceToken = element
+            .toString()
+            .substring(element.indexOf("=") + 1, element.indexOf(";"));
         success = true;
       }
     });
     return success;
   }
-
 
   bool setSecurityFromResponse(Response response) {
     xiomiSecurity = XiomiSecurity.fromResponse(response);
@@ -313,8 +438,8 @@ class TokenExtractor {
   /// Generates device id
   String generateDeviceId({length = 6}) {
     if (deviceId == null) {
-      deviceId = String.fromCharCodes(Iterable.generate(
-          length, (_) => 97 + _rnd.nextInt(122 - 97)));
+      deviceId = String.fromCharCodes(
+          Iterable.generate(length, (_) => 97 + _rnd.nextInt(122 - 97)));
     }
     return deviceId;
   }
@@ -354,11 +479,16 @@ class TokenExtractor {
     Cookie deviceXioMi = Cookie("sdkVersion", "accountsdk-18.8.15");
     deviceXioMi.domain = "mi.com";
 
-    return ([deviceMi, deviceXioMi, sdkXioMi, sdkMi].fold(
-        "", (value, element) => element.toString() + ";" + value) + ";" +
-        addedCookies).replaceAll(";;", ";");
+    return ([
+              deviceMi,
+              deviceXioMi,
+              sdkXioMi,
+              sdkMi
+            ].fold("", (value, element) => element.toString() + ";" + value) +
+            ";" +
+            addedCookies)
+        .replaceAll(";;", ";");
   }
-
 
   login() async {
     if (deviceResults != null && deviceResults.isNotEmpty && cacheDevices) {
@@ -375,27 +505,42 @@ class TokenExtractor {
     return success;
   }
 
-  Future<List<XiomiDevice>> geDevices() {
+  Future<List<XiomiDevice>> geDevices() async {
     if (deviceResults != null && deviceResults.isNotEmpty && cacheDevices) {
       return Future(() => deviceResults);
     }
 
     String apiUrl = getApiUrl(server) + "/home/device_list";
     Map<String, String> params = new Map<String, String>.from({
-      "data": '{"getVirtualModel":true,"getHuamiDevices":1,"get_split_device":false,"support_smart_home":true}'
+      "data":
+          '{"getVirtualModel":true,"getHuamiDevices":1,"get_split_device":false,"support_smart_home":true}'
     });
+
+    String responseBody = await callEncrypted(apiUrl, params);
+
+    return XiomiDevice.fromXiomiResponseBody(responseBody);
+  }
+
+  Future<String> getMap() {
+    String apiUrl = getApiUrl(server) + "/v2/home/get_interim_file_url";
+    Map<String, String> params =
+        new Map<String, String>.from({"data": '{"obj_name": ' + '}'});
 
     return callEncrypted(apiUrl, params);
   }
 
   String getApiUrl(XiomiServer serverLocation) {
     return "https://" +
-        (serverLocation == XiomiServer.cn ? "" : serverLocation.name
-            .toString() + ".") + "api.io.mi.com/app";
+        (serverLocation == XiomiServer.cn
+            ? ""
+            : serverLocation.name.toString() + ".") +
+        "api.io.mi.com/app";
   }
 
-  Future<List<XiomiDevice>> callEncrypted(String apiUrl,
-      Map<String, dynamic> params) async {
+  Future<String> callEncrypted(
+      String apiUrl, Map<String, dynamic> params) async {
+    String results = "";
+
     Map headers = new Map<String, dynamic>.from({
       "Accept-Encoding": "identity",
       "User-Agent": getAgent(),
@@ -404,10 +549,7 @@ class TokenExtractor {
       "MIOT-ENCRYPT-ALGORITHM": "ENCRYPT-RC4",
     });
 
-    //xiomiSecurity.serviceToken = "NDXOlYt6xKj8uB9vOZymp2391CNz6aJUNzi2uC+14Qz2k4kwUThYMVKplQi5vZaQAO6KnE8PsfxslC7HInlfyXbRtf3EqyWaJXoK/nLPOlW+Hr4j9hj0E4AMbdY7eciH/cVZXrsLr5WNgByLqM6Qhwtf2mOqnRqbO3IfgBLz7LQ=";
-    //xiomiSecurity.ssecurity = "iKmmoY9j2YLo6QYIMsNIKA==";
-
-    List <Cookie> cookies = [
+    List<Cookie> cookies = [
       Cookie("userId", xiomiSecurity.userId),
       Cookie("yetAnotherServiceToken", xiomiSecurity.serviceToken),
       Cookie("serviceToken", xiomiSecurity.serviceToken),
@@ -421,10 +563,8 @@ class TokenExtractor {
     ];
     cookieJar.saveFromResponse(Uri.parse(apiUrl), cookies);
 
-    String nonce = generateNonce(DateTime
-        .now()
-        .millisecondsSinceEpoch
-        .floor() * 1000);
+    String nonce =
+        generateNonce(DateTime.now().millisecondsSinceEpoch.floor() * 1000);
 
     String signedNonce = signNonce(nonce, xiomiSecurity.ssecurity);
     Map<String, dynamic> fields = generateEncParams(
@@ -436,12 +576,11 @@ class TokenExtractor {
         data: FormData.fromMap(fields));
 
     if (response.statusCode == 200) {
-      String decodedBody = decryptRc4(
-          signNonce(fields["_nonce"], xiomiSecurity.ssecurity),
+      results = decryptRc4(signNonce(fields["_nonce"], xiomiSecurity.ssecurity),
           response.data.toString());
-      deviceResults = XiomiDevice.fromXiomiResponseBody(decodedBody);
-      return deviceResults;
     }
+
+    return results;
   }
 
   String signNonce(String nonce, String secret) {
@@ -451,45 +590,42 @@ class TokenExtractor {
   }
 
   String generateSignParams(String apiUrl, String signedNonce, String nonce,
-
       Map<dynamic, dynamic> params) {
-    List<String> signatureParams = [apiUrl
-        .split("com")
-        .last, signedNonce, nonce];
-    params.forEach((key, value) =>
-        signatureParams.add(key + '=' + value.toString()));
+    List<String> signatureParams = [
+      apiUrl.split("com").last,
+      signedNonce,
+      nonce
+    ];
+    params.forEach(
+        (key, value) => signatureParams.add(key + '=' + value.toString()));
     String signatureString = signatureParams.join("&");
 
     Hmac hash = Hmac(sha256, base64Decode(signedNonce));
-    Digest results = hash.convert(
-        utf8.encode(signatureString)
-    );
+    Digest results = hash.convert(utf8.encode(signatureString));
     return base64Encode(results.bytes);
   }
 
   String generateNonce(int millis) {
-    List bytes = randomBytes(8) + (Uint8List(4)
-      ..buffer.asByteData().setInt32(0, (millis / 60000).floor(), Endian.big));
-    return Uri.encodeComponent(base64Encode(bytes));
+    List bytes = randomBytes(8) +
+        (Uint8List(4)
+          ..buffer
+              .asByteData()
+              .setInt32(0, (millis / 60000).floor(), Endian.big));
+    return Uri.decodeComponent(base64Encode(bytes));
   }
-
 
   String generateEncSign(String apiUrl, String method, String signedNonce,
       Map<dynamic, dynamic> params) {
-    List signatureParams = [method.toUpperCase(), apiUrl
-        .split("com")
-        .last
-        .replaceAll("/app/", "/")
+    List signatureParams = [
+      method.toUpperCase(),
+      apiUrl.split("com").last.replaceAll("/app/", "/")
     ];
-    params.forEach((key, value) =>
-        signatureParams.add(key + '=' + value));
+    params.forEach((key, value) => signatureParams.add(key + '=' + value));
     signatureParams.add(signedNonce);
 
     String signatureString = signatureParams.join("&");
 
-    Digest results = sha1.convert(
-        utf8.encode(signatureString)
-    );
+    Digest results = sha1.convert(utf8.encode(signatureString));
     return base64Encode(results.bytes);
   }
 
@@ -511,8 +647,7 @@ class TokenExtractor {
     List<int> baseNonce = base64Decode(secretKey);
     RC4 encrypter = RC4.fromBytes(baseNonce);
     encrypter.decodeBytes(List.generate(1024, (index) => 0), true);
-    return
-      base64Encode(encrypter.encodeBytes(utf8.encode(value)));
+    return base64Encode(encrypter.encodeBytes(utf8.encode(value)));
   }
 
   String decryptRc4(String secretKey, String payload) {
@@ -520,5 +655,9 @@ class TokenExtractor {
     RC4 encrypter = RC4.fromBytes(baseNonce);
     encrypter.decodeBytes(List.generate(1024, (index) => 0), true);
     return encrypter.decodeBytes(base64Decode(payload), true);
+  }
+
+  Future<Response> getMapData(String url) {
+    return httpClient.get(url);
   }
 }

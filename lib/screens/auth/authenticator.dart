@@ -78,7 +78,7 @@ class AuthenticatorState extends State<Authenticator> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                      'Make sure that you verified your email and entered your credentials correctly'),
+                      'Make sure that you have verified your email and entered your credentials correctly'),
                 ),
               ),
             )

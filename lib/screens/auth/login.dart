@@ -8,7 +8,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class LoginScreen {
   AuthenticatorState parent;
   SocialLogin socialLogin;
@@ -52,6 +51,7 @@ class LoginScreen {
           if (!parent.isLoginAction())
             TextField(
               controller: parent.confirmPasswordController,
+              obscureText: true,
               decoration: InputDecoration(
                   labelText: 'Repeat password',
                   helperText: 'Retype your password',
@@ -134,33 +134,38 @@ class LoginScreen {
     } else if (!isPasswordValid) {
       parent.setState(() {
         parent.passwordError =
-        'Password length should have at least 6 characters';
+            'Password length should have at least 6 characters';
         parent.passwordError =
-        'Passwords does not match, please provide a password that you can remember';
+            'Passwords does not match, please provide a password that you can remember';
       });
     } else {
       parent.setState(() {
         resetErrors();
       });
-      Map<String, dynamic> response = await BackendRequester.authenticate(parent.currentAction, email, password);
+      try {
+        Map<String, dynamic> response = await BackendRequester.authenticate(
+            parent.currentAction, email, password);
 
-      if (response['success']) {
-        parent.setState(() {
-          parent.backendUser = User.fromApp(response['userId'], email, response['isVerified']);
-          log(parent.backendUser.emailVerified.toString());
-        });
-      } else {
-        parent.setState(() {
-          parent.emailError = 'email maybe wrong';
-          parent.passwordError = 'password maybe wrong';
-        });
+        if (response['success'] != null && response['success']) {
+          parent.setState(() {
+            parent.backendUser =
+                User.fromApp(response['userId'], email, response['isVerified']);
+            log(parent.backendUser.emailVerified.toString());
+          });
+        } else {
+          parent.setState(() {
+            parent.emailError = 'email maybe wrong';
+            parent.passwordError = 'password maybe wrong';
+          });
+        }
+      } finally {
+        parent.setLoading(false);
       }
     }
-    parent.setLoading(true);
+    parent.setLoading(false);
   }
 
-  void resetErrors()
-  {
+  void resetErrors() {
     parent.setState(() {
       parent.emailError = null;
       parent.passwordError = null;
@@ -168,9 +173,9 @@ class LoginScreen {
     });
   }
 
-  bool validateEmail(String email) {
+  static bool validateEmail(String email) {
     return RegExp(
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(email);
   }
 

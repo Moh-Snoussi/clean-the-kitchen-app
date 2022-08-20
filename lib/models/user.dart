@@ -33,6 +33,8 @@ class User {
 
   bool notificationRegistered = false;
 
+  static FlutterSecureStorage _storage;
+
   User(
       {this.userEmail,
       this.provider,
@@ -71,6 +73,15 @@ class User {
         providerId: userId.toString(),
         emailVerified: emailVerified,
         userId: userId);
+  }
+
+  static Future<User> fromSecureStorage() async {
+    if (_storage == null) {
+      _storage = FlutterSecureStorage();
+    }
+    Map<String, String> data = await _storage.readAll();
+
+    return User.fromSession(data);
   }
 
   writeInSession(FlutterSecureStorage session) async {

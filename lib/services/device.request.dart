@@ -10,6 +10,7 @@ class Command {
   String token;
   String deviceIp;
   Map<String, dynamic> command;
+  bool success;
 
   Command({this.randomId, this.token, this.deviceIp, this.command});
 
@@ -18,6 +19,16 @@ class Command {
       token: message.data['token'],
       deviceIp: message.data['deviceIp'],
       command: jsonDecode(message.data['commands']));
+
+  Map toJson() {
+    return {
+      "randomId": randomId,
+      "token": token,
+      "deviceIp": deviceIp,
+      "command": command,
+      "success": success
+    };
+  }
 }
 
 class DeviceRequester {

@@ -48,5 +48,10 @@ void registerPushHandler(User user) async
 
 _deviceActivate(RemoteMessage message) {
   Command command = Command.fromMessage(message);
+  try {
   DeviceRequester.forwardCommands(command);
+    command.success = true;
+  } catch (e) {
+  }
+  User.fromSecureStorage().then((user) => BackendRequester.logOnBackend(command, user));
 }
