@@ -86,7 +86,7 @@ class AuthenticatorState extends State<Authenticator> {
   }
 
   void authenticate() async {
-    bool success = await BackendRequester.validateUserToken(backendUser);
+    bool success = await BackendRequester.validateUserRefreshToken(backendUser);
 
     if (success) {
       SessionService.saveUser(backendUser);

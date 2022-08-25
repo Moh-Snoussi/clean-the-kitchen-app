@@ -174,7 +174,7 @@ class XiomiDevice {
   }
 
   static List<XiomiDevice> fromListMaps(List resultList) {
-    List<XiomiDevice> results;
+    List<XiomiDevice> results = [];
     resultList.forEach((element) {
       results.add(XiomiDevice(
           name: element["name"],

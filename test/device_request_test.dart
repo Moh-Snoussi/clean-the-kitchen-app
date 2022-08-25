@@ -16,7 +16,7 @@ void main() {
       MiIoDevice device = new MiIoDevice(
           token: hex.decode("4e4c6b55736454564d6952334574506b"),
           address: InternetAddress.tryParse("192.168.2.39"));
- dynamic deviceResponse = await device.call("miIO.status", []);
+ dynamic deviceResponse = await device.call("miIO.info", []);
 
 
       //dynamic deviceResponse = await device.call("get_properties", [{'did': 'battery_level', 'siid': 2, 'piid': 1}]);
@@ -27,7 +27,6 @@ void main() {
       TokenExtractor extractor = TokenExtractor(
           XiomiUser(
               username: 'sooniic@live.com', //usernameController.value.text,
-              password: '720327Sonic', // userpassController.value.text,
               server: XiomiServer.de),
           cacheDevices: true);
       bool loginSuccess = await extractor.login();

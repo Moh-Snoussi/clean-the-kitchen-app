@@ -43,19 +43,14 @@ class User {
       this.userId = 0});
 
   factory User.empty() {
-    return User(
-        userEmail: '',
-        provider: '',
-        providerId: ''
-    );
+    return User(userEmail: '', provider: '', providerId: '');
   }
 
   factory User.fromAmazon(LwaUser lwaUser) {
     return User(
         userEmail: lwaUser.userEmail,
         provider: 'Amazon',
-        providerId: lwaUser.userId
-    );
+        providerId: lwaUser.userId);
   }
 
   factory User.fromGoogle(GoogleSignInAccount googleUser) {
@@ -81,56 +76,65 @@ class User {
     }
     Map<String, String> data = await _storage.readAll();
 
-    return User.fromSession(data);
+    User user = User.fromSession(data);
+    bool success = await BackendRequester.validateUserRefreshToken(user);
+    if (!success) {
+      user = User.empty();
+    }
+    return user;
   }
 
   writeInSession(FlutterSecureStorage session) async {
     session.write(key: 'userId', value: userId.toString() ?? '');
-    session.write(key:'accessToken',value: accessToken ?? '');
-    session.write(key:'refreshToken',value: refreshToken ?? '');
-    session.write(key:'validUntil',value: validUntil.toString() ?? '');
-    session.write(key:'userEmail',value: userEmail ?? '');
-    session.write(key:'provider',value: provider ?? '');
-    session.write(key:'providerId',value: providerId ?? '');
-    session.write(key:'mobileId',value: mobileId ?? '');
-    session.write(key:'secret',value: secret ?? '');
-    session.write(key:'clientId',value: clientId ?? '');
-    session.write(key:'notificationRegistered', value: notificationRegistered.toString() );
+    session.write(key: 'accessToken', value: accessToken ?? '');
+    session.write(key: 'refreshToken', value: refreshToken ?? '');
+    session.write(key: 'validUntil', value: validUntil.toString() ?? '');
+    session.write(key: 'userEmail', value: userEmail ?? '');
+    session.write(key: 'provider', value: provider ?? '');
+    session.write(key: 'providerId', value: providerId ?? '');
+    session.write(key: 'mobileId', value: mobileId ?? '');
+    session.write(key: 'secret', value: secret ?? '');
+    session.write(key: 'clientId', value: clientId ?? '');
+    session.write(
+        key: 'notificationRegistered',
+        value: notificationRegistered.toString());
   }
 
   factory User.fromSession(Map<String, dynamic> session) {
-      User user = User.empty();
-    if(session['userId'] != null) {
-        user.userEmail = session['userEmail'] ?? '';
-        user.provider = session['provider'] ?? '';
-        user.providerId = session['providerId'] ?? '';
-        user.emailVerified = session['emailVerified'] != null && session['emailVerified'] == 'true';
-        user.userId = int.parse(session['userId']) ?? 0;
-        user.accessToken = session['accessToken'] ?? '';
-        user.refreshToken = session['refreshToken'] ?? '';
-        user.validUntil = int.parse(session['validUntil']);
-        user.providerId = session['providerId'] ?? '';
-        user.mobileId = session['mobileId'] ?? '';
-        user.clientId = session['clientId'] ?? '';
-        user.secret = session['secret'] ?? '';
-        user.notificationRegistered = session['notificationRegistered'] == 'true';
-      }
+    User user = User.empty();
+    if (session['userId'] != null) {
+      user.userEmail = session['userEmail'] ?? '';
+      user.provider = session['provider'] ?? '';
+      user.providerId = session['providerId'] ?? '';
+      user.emailVerified = session['emailVerified'] != null &&
+          session['emailVerified'] == 'true';
+      user.userId = int.parse(session['userId']) ?? 0;
+      user.accessToken = session['accessToken'] ?? '';
+      user.refreshToken = session['refreshToken'] ?? '';
+      user.validUntil = int.parse(session['validUntil']);
+      user.providerId = session['providerId'] ?? '';
+      user.mobileId = session['mobileId'] ?? '';
+      user.clientId = session['clientId'] ?? '';
+      user.secret = session['secret'] ?? '';
+      user.notificationRegistered = session['notificationRegistered'] == 'true';
+    }
 
     return user;
   }
 
-  Future <bool> isFullyAuthenticated() async {
-    bool returns = userId != null && userId > 0 &&
+  Future<bool> isFullyAuthenticated() async {
+    bool returns = userId != null &&
+        userId > 0 &&
         accessToken.isNotEmpty &&
         refreshToken.isNotEmpty &&
         clientId.isNotEmpty &&
-        secret !=null && secret.isNotEmpty &&
+        secret != null &&
+        secret.isNotEmpty &&
         validUntil != null &&
         userEmail.isNotEmpty;
 
-
-    if (returns){
-     returns = await BackendRequester.validateAccessToken(this);
+    if (returns) {
+      returns = await BackendRequester.validateAccessToken(this);
     }
 
     return returns;
@@ -180,5 +184,4 @@ class User {
         this.refreshToken.isNotEmpty &&
         this.validUntil != null;
   }
-
 }

@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:alexa_clean_the_kitchen/models/user.dart';
+import 'package:alexa_clean_the_kitchen/reactor.dart';
 import 'package:alexa_clean_the_kitchen/services/backend.requester.dart';
 import 'package:alexa_clean_the_kitchen/services/device.request.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 int userId;
 String backendToken;
 String refreshToken;
+bool busy = false;
 
 getPermission(User user) async {
   Firebase.initializeApp().then((value) async {
@@ -22,7 +24,14 @@ getPermission(User user) async {
       sound: true,
     );
 
+    messaging.onTokenRefresh.listen((token) {
+      log(token.toString(), name: "push token from firebase refresh");
+      user.mobileId = token.toString();
+      BackendRequester.registerPushClient(user);
+    });
+
     String token = await messaging.getToken();
+    log(token.toString(), name: "push token from firebase");
     user.mobileId = token.toString();
     BackendRequester.registerPushClient(user);
   });
@@ -34,24 +43,43 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   _deviceActivate(message);
 }
 
-void registerPushHandler(User user) async
-{
+void registerPushHandler(User user) async {
   await getPermission(user);
 
   if (!user.notificationRegistered) {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) =>
-        _deviceActivate(message));
+    FirebaseMessaging.onMessage
+        .listen((RemoteMessage message) => _deviceActivate(message));
     user.notificationRegistered = true;
   }
 }
 
-_deviceActivate(RemoteMessage message) {
-  Command command = Command.fromMessage(message);
-  try {
-  DeviceRequester.forwardCommands(command);
-    command.success = true;
-  } catch (e) {
+_deviceActivate(RemoteMessage message) async {
+  log(message.notification.body.toString(), name: "from fireBaseMessage");
+
+  Command command;
+  if (!busy) {
+    try {
+      busy = true;
+
+      command = Command.fromMessage(message);
+      try {
+        command.success = await DeviceRequester.forwardCommands(command);
+      } catch (e) {
+        command.errors = e.toString();
+        log(e.toString(), name: "from push notification error");
+      }
+    } catch (e) {
+      print(e.toString());
+    } finally {
+      busy = false;
+      if (command != null && command.success != null) {
+        User user = await User.fromSecureStorage();
+        Map response = await BackendRequester.logOnBackend(command, user);
+        log(response.toString(),
+            name:
+            "from backend log device action response 'api/device/action_process'");
+      }
+    }
   }
-  User.fromSecureStorage().then((user) => BackendRequester.logOnBackend(command, user));
 }
