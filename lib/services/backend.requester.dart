@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 class BackendRequester {
   static const String auth_v2_path = '/oauth/v2/token';
 
-  static const String backendUrl = '192.168.2.34:8000';
+  static const String backendUrl = 'www.alexa-clean-the-kitchen.de';// '192.168.2.34:8000';
 
   // '192.168.2.108:7000'; //'www.alexa-clean-the-kitchen.de';
   static final String apiBase = '/api/';
@@ -42,7 +42,7 @@ class BackendRequester {
     if (user.accessToken != null) {
       await http
           .get(
-              Uri.http(backendUrl, apiBase + 'push_subscriber',
+              Uri.https(backendUrl, apiBase + 'push_subscriber',
                   {'mobileId': user.mobileId}),
               headers: generateAuthHeaders(user.accessToken))
           .then((value) => {log(value.body.toString())});
@@ -71,7 +71,7 @@ class BackendRequester {
 
   static _refreshUserToken(User user) async {
     log(user.refreshToken, name: 'refreshToken');
-    return await http.post(Uri.http(backendUrl, auth_v2_path), headers: {
+    return await http.post(Uri.https(backendUrl, auth_v2_path), headers: {
       "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
     }, body: {
       "grant_type": "refresh_token",
@@ -83,7 +83,7 @@ class BackendRequester {
 
   void sendPush() {
     // http.url
-    //     .get(Uri.http(backendUrl, 'test'))
+    //     .get(Uri.https(backendUrl, 'test'))
     //     .then((http.Response value) => {log(value.body.toString())});
   }
 
@@ -91,7 +91,7 @@ class BackendRequester {
     assert(user.validate(), 'Tokens are not valid');
 
     http.Response response = await http.get(
-        Uri.http(backendUrl, apiBase + 'validate'),
+        Uri.https(backendUrl, apiBase + 'validate'),
         headers: generateAuthHeaders(user.accessToken));
 
     Map<String, dynamic> jsonBody = jsonDecode(response.body.toString());
@@ -109,7 +109,7 @@ class BackendRequester {
     Map<String, String> body = {'email': email, 'password': password};
 
     String targetPath = currentAction == 'Register' ? 'register' : 'login';
-    http.Response response = await http.post(Uri.http(backendUrl, targetPath),
+    http.Response response = await http.post(Uri.https(backendUrl, targetPath),
         headers: headers, body: jsonEncode(body));
     return jsonDecode(response.body);
   }
@@ -118,7 +118,8 @@ class BackendRequester {
     String path = 'is_verified/' + userId.toString();
 
     http.Response response =
-        await http.get(Uri.http(backendUrl, path), headers: headers);
+        await http.get(Uri.https(backendUrl, path), headers: headers);
+
 
     Map<String, dynamic> jsonBody = jsonDecode(response.body.toString());
     return jsonBody['success'];
@@ -128,7 +129,7 @@ class BackendRequester {
     String path = '/app/authenticator';
 
     http.Response response =
-        await http.post(Uri.http(backendUrl, path), headers: {
+        await http.post(Uri.https(backendUrl, path), headers: {
       'Accept': 'application/json'
     }, body: {
       'provider': user.provider,
@@ -146,7 +147,7 @@ class BackendRequester {
       List<XiomiDevice> devices, User user) async {
     if (user.validate()) {
       http.Response response =
-          await http.post(Uri.http(backendUrl, apiBase + 'sync/device'),
+          await http.post(Uri.https(backendUrl, apiBase + 'sync/device'),
               body: jsonEncode({
                 "devices": [...devices.map((element) => element.asJson)]
               }),
@@ -159,7 +160,7 @@ class BackendRequester {
   static Future<Map> logOnBackend(Command command, User user) async {
     try {
       http.Response response = await http.post(
-          Uri.http(backendUrl, apiBase + 'device/action_process'),
+          Uri.https(backendUrl, apiBase + 'device/action_process'),
           body: jsonEncode({"device":command.toJson()}),
           headers: generateAuthHeaders(user.accessToken));
       return json.decode(response.body);
@@ -172,7 +173,7 @@ class BackendRequester {
       User user, XiomiDevice selectedDevice, String newName) async {
     if (user.validate()) {
       http.Response response = await http.post(
-          Uri.http(backendUrl, apiBase + 'device/rename'),
+          Uri.https(backendUrl, apiBase + 'device/rename'),
           body: jsonEncode(
               {"device": selectedDevice.toJson(), "newName": newName}),
           headers: {...generateAuthHeaders(user.accessToken)});
@@ -185,7 +186,7 @@ class BackendRequester {
     List<XiomiDevice> results;
     if (user.validate()) {
       http.Response response = await http.get(
-          Uri.http(backendUrl, apiBase + 'devices'),
+          Uri.https(backendUrl, apiBase + 'devices'),
           headers: {...generateAuthHeaders(user.accessToken)});
 
       Map jsonBody = jsonDecode(response.body);
@@ -204,7 +205,7 @@ class BackendRequester {
       User user, String deviceMac, String relatedUserEmail) async {
     if (user.validate()) {
       http.Response response = await http.post(
-          Uri.http(backendUrl, apiBase + 'relatives'),
+          Uri.https(backendUrl, apiBase + 'relatives'),
           body: jsonEncode({"email": relatedUserEmail, "deviceMac": deviceMac}),
           headers: {...generateAuthHeaders(user.accessToken)});
       return json.decode(response.body);
@@ -216,7 +217,7 @@ class BackendRequester {
       User user, String deviceMac, String relatedUserEmail) async {
     if (user.validate()) {
       http.Response response = await http.post(
-          Uri.http(backendUrl, apiBase + 'remove_relatives'),
+          Uri.https(backendUrl, apiBase + 'remove_relatives'),
           body: jsonEncode({"email": relatedUserEmail, "deviceMac": deviceMac}),
           headers: {...generateAuthHeaders(user.accessToken)});
       return json.decode(response.body);
@@ -227,7 +228,7 @@ class BackendRequester {
   static Future<Map> securePost(User user, Map params, String apiPath) async {
     if (user.validate()) {
       http.Response response = await http.post(
-          Uri.http(backendUrl, apiBase + apiPath),
+          Uri.https(backendUrl, apiBase + apiPath),
           body: jsonEncode(params),
           headers: {...generateAuthHeaders(user.accessToken)});
       return json.decode(response.body);
@@ -238,7 +239,7 @@ class BackendRequester {
   static Future<Map> secureGet(User user, String apiPath) async {
     if (user.validate()) {
       http.Response response = await http.get(
-          Uri.http(backendUrl, apiBase + apiPath),
+          Uri.https(backendUrl, apiBase + apiPath),
           headers: {...generateAuthHeaders(user.accessToken)});
       return json.decode(response.body);
     }

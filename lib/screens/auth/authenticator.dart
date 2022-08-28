@@ -23,6 +23,8 @@ class Authenticator extends StatefulWidget {
 class AuthenticatorState extends State<Authenticator> {
   MyHomePageState parent;
 
+  String errorMessages = "";
+
   AuthenticatorState({this.parent});
 
   bool authenticationFailed = false;
@@ -104,5 +106,12 @@ class AuthenticatorState extends State<Authenticator> {
   void logout() {
     backendUser = User.empty();
     parent.logoutUser();
+  }
+
+  void setErrorMessage(String errorMessage) {
+    this.setLoading(false);
+    this.setState(() {
+      this.errorMessages = errorMessage;
+    });
   }
 }

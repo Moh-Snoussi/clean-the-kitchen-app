@@ -48,6 +48,7 @@
         <activity android:name="com.amazon.identity.auth.device.workflow.WorkflowActivity"
             android:theme="@android:style/Theme.NoDisplay"
             android:allowTaskReparenting="true"
+            android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>

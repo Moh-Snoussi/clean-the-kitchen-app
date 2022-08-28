@@ -9,6 +9,8 @@ import '../models/user.dart';
 
 class Command {
   int randomId;
+  String description;
+  String room;
   String token;
   String deviceIp;
   String mac;
@@ -26,7 +28,9 @@ class Command {
       this.commands,
       this.mac,
       this.actionLogId,
-      this.errors});
+      this.errors,
+      this.description,
+      this.room});
 
   factory Command.fromMessage(RemoteMessage message) {
     Map data;
@@ -37,12 +41,16 @@ class Command {
     }
 
     return new Command(
-        randomId: int.parse(data['randomId'].toString()),
-        token: data['token'],
-        deviceIp: data['deviceIp'],
-        mac: data['mac'],
-        commands: data['commands'] is List ? data["commands"] : jsonDecode(data["commands"]),
-        actionLogId: data['actionLogId']) ?? 0;
+            description: message.notification.title,
+            room: data["room"],
+            randomId: int.parse(data['randomId'].toString()),
+            token: data['token'],
+            deviceIp: data['deviceIp'],
+            mac: data['mac'],
+            commands: data['commands'] is List
+                ? data["commands"]
+                : jsonDecode(data["commands"]),
+            actionLogId: data['actionLogId']) ?? 0;
   }
 
   Map toJson() {
@@ -54,7 +62,9 @@ class Command {
       "mac": mac,
       "actionLogId": actionLogId,
       "success": success,
-      "errors": errors
+      "errors": errors,
+      "description": description,
+      "room": room
     };
   }
 }

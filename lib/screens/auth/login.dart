@@ -62,40 +62,50 @@ class LoginScreen {
               child: ElevatedButton(
                 child: Text(parent.currentAction),
                 style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                        EdgeInsets.all(20)),
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ))),
+                      borderRadius: BorderRadius.zero,
+                    ))),
                 onPressed: () => appAuthenticate(),
               )),
-          ElevatedButton.icon(
-            label: Text(
-              parent.currentAction + " with Google",
-              textAlign: TextAlign.left,
-            ),
-            style: ButtonStyle(
-                alignment: Alignment.center,
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ))),
-            icon: FaIcon(FontAwesomeIcons.google),
-            onPressed: () => new SocialLogin(this.parent).handleGoogleSignIn(),
-          ),
-          ElevatedButton.icon(
-            label: Text(
-              parent.currentAction + " with Amazon",
-              textAlign: TextAlign.left,
-            ),
-            style: ButtonStyle(
-                alignment: Alignment.center,
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ))),
-            icon: FaIcon(FontAwesomeIcons.amazon),
-            onPressed: () => new SocialLogin(this.parent).handleLWASignIn(),
-          ),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(0, 20.0, 0, 0),
+              child: ElevatedButton.icon(
+                label: Text(
+                  parent.currentAction + " with Google",
+                  textAlign: TextAlign.left,
+                ),
+                style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                        EdgeInsets.all(20)),
+                    alignment: Alignment.center,
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ))),
+                icon: FaIcon(FontAwesomeIcons.google),
+                onPressed: () =>
+                    new SocialLogin(this.parent).handleGoogleSignIn(),
+              )),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(0, 20.0, 0, 0),
+              child: ElevatedButton.icon(
+                label: Text(
+                  parent.currentAction + " with Amazon",
+                  textAlign: TextAlign.left,
+                ),
+                style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                        EdgeInsets.all(20)),    alignment: Alignment.center,
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ))),
+                icon: FaIcon(FontAwesomeIcons.amazon),
+                onPressed: () => new SocialLogin(this.parent).handleLWASignIn(),
+              )),
           Container(
             padding: EdgeInsets.only(top: 20),
             child: Center(
@@ -116,11 +126,26 @@ class LoginScreen {
               ])),
             ),
           ),
+          if (parent.errorMessages != "")Container(
+            padding: EdgeInsets.only(top: 20, bottom: 20),
+            color: Colors.deepOrange,
+            child: Center(
+              child: new RichText(
+                  text: new TextSpan(children: [
+                    new TextSpan(
+                      text: parent.errorMessages,
+                      style: new TextStyle(color: Colors.black, backgroundColor: Colors.deepOrange),
+                    ),
+                  ])),
+            ),
+          ),
         ]);
   }
 
   appAuthenticate() async {
+
     parent.setLoading(true);
+    User.clearFromSession();
     String email = parent.emailController.text;
     String password = parent.passwordController.text;
     String repeatedPassword = parent.confirmPasswordController.text;
@@ -189,4 +214,5 @@ class LoginScreen {
     }
     return isValid;
   }
+
 }

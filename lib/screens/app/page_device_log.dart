@@ -8,7 +8,7 @@ import '../auth/login.dart';
 import 'AppWidget.dart';
 
 Widget getDeviceLogPage(AppWidgetState parent) {
-  if (parent.logs.length == 0) {
+  if (parent.logs == null || parent.logs.length == 0) {
     getLogs(parent.user).then((value) => parent.setLogs(value));
   }
   return Card(

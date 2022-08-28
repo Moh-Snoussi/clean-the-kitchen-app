@@ -84,6 +84,26 @@ class User {
     return user;
   }
 
+  static Future<void> clearFromSession() async {
+    if (_storage == null) {
+      _storage = FlutterSecureStorage();
+    }
+
+    await _storage.delete(key: 'userEmail');
+    await _storage.delete(key: 'provider');
+    await _storage.delete(key: 'providerId');
+    await _storage.delete(key: 'emailVerified');
+    await _storage.delete(key: 'userId');
+    await _storage.delete(key: 'accessToken');
+    await _storage.delete(key: 'refreshToken');
+    await _storage.delete(key: 'validUntil');
+    await _storage.delete(key: 'providerId');
+    await _storage.delete(key: 'mobileId');
+    await _storage.delete(key: 'clientId');
+    await _storage.delete(key: 'secret');
+    await _storage.delete(key: 'notificationRegistered');
+  }
+
   writeInSession(FlutterSecureStorage session) async {
     session.write(key: 'userId', value: userId.toString() ?? '');
     session.write(key: 'accessToken', value: accessToken ?? '');

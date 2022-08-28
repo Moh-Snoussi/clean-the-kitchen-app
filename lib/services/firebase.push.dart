@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:alexa_clean_the_kitchen/models/user.dart';
-import 'package:alexa_clean_the_kitchen/reactor.dart';
 import 'package:alexa_clean_the_kitchen/services/backend.requester.dart';
 import 'package:alexa_clean_the_kitchen/services/device.request.dart';
 import 'package:firebase_core/firebase_core.dart';

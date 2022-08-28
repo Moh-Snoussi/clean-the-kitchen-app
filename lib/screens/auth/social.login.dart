@@ -39,7 +39,9 @@ class SocialLogin {
     });
     try {
       await _googleSignIn.signIn();
-    } catch (error) {log.info(error.toString());}
+    } catch (error) {log.info(error.toString());
+    parent.setErrorMessage(error.toString());
+    }
     parent.setLoading(false);
   }
 
@@ -63,6 +65,8 @@ class SocialLogin {
     });
     try {
       await _loginWithAmazon.signIn();
-    } catch (error) {}
+    } catch (error) {
+      parent.setErrorMessage(error.toString());
+    }
   }
 }

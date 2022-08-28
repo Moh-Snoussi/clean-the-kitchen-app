@@ -7,7 +7,7 @@ import '../auth/login.dart';
 import 'AppWidget.dart';
 
 Widget getDeviceConnectorPage(AppWidgetState parent) {
-  if (parent.devices.length == 0) {
+  if (parent.devices == null || parent.devices.length == 0) {
     BackendRequester.getDevices(parent.user).then((value) {
       parent.setLoading(false);
       parent.setDevices(value);
