@@ -9,7 +9,8 @@ import 'package:http/http.dart' as http;
 class BackendRequester {
   static const String auth_v2_path = '/oauth/v2/token';
 
-  static const String backendUrl = 'www.alexa-clean-the-kitchen.de';// '192.168.2.34:8000';
+  static const String backendUrl =
+      'www.alexa-clean-the-kitchen.de'; // '192.168.2.34:8000';
 
   // '192.168.2.108:7000'; //'www.alexa-clean-the-kitchen.de';
   static final String apiBase = '/api/';
@@ -98,10 +99,16 @@ class BackendRequester {
 
     log(jsonBody.toString());
 
-    return jsonBody['success'] != null &&
+    if (jsonBody['success'] != null &&
         jsonBody['success'] &&
-        jsonBody['userId'] == user.userId &&
-        jsonBody['emailVerified'];
+        jsonBody['userId'] != null &&
+        jsonBody['emailVerified']) {
+      user.userEmail = jsonBody['userEmail'];
+      user.userId = jsonBody['userId'];
+      return true;
+    }
+
+    return false;
   }
 
   static Future<Map<String, dynamic>> authenticate(
@@ -119,7 +126,6 @@ class BackendRequester {
 
     http.Response response =
         await http.get(Uri.https(backendUrl, path), headers: headers);
-
 
     Map<String, dynamic> jsonBody = jsonDecode(response.body.toString());
     return jsonBody['success'];
@@ -161,7 +167,7 @@ class BackendRequester {
     try {
       http.Response response = await http.post(
           Uri.https(backendUrl, apiBase + 'device/action_process'),
-          body: jsonEncode({"device":command.toJson()}),
+          body: jsonEncode({"device": command.toJson()}),
           headers: generateAuthHeaders(user.accessToken));
       return json.decode(response.body);
     } catch (e) {

@@ -55,11 +55,16 @@ class MyHomePageState extends State<StateHome> with TickerProviderStateMixin {
   }
 
   Future<bool> _fetchCredentials() async {
+    try {
+
     Map<String, String> data = await _storage.readAll();
 
     this.user = User.fromSession(data);
 
     return this.user.isFullyAuthenticated();
+    } catch (e) {
+      log(e.toString(), name: "error from fetchCredentials");
+    }
   }
 
   void logoutUser() {

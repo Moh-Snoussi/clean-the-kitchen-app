@@ -43,33 +43,10 @@ class TokenRequester {
           if (!parent.backendUser.emailVerified)
             Row(
               children: [
-                Container(
-                  height: 70,
-                  width: 70,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(50))),
-                    color: Colors.orange.shade300,
-                    child: IconButton(
-                      icon: Icon(Icons.verified_user_outlined, size: 30),
-                      onPressed: () => _checkVerification(),
-                    ),
-                  ),
-                ),
                 Expanded(
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        child: Text(
-                          'Please verify your email: ' +
-                              parent.backendUser.userEmail,
-                          style: (TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                    ),
                   ],
                 ))
               ],
@@ -97,9 +74,7 @@ class TokenRequester {
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                       child: Text(
-                        'one more step is required:' +
-                            parent.backendUser.provider +
-                            ', one more step is required:',
+                        'Login into the website and Import the keys',
                         style: (TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
@@ -298,15 +273,5 @@ class TokenRequester {
         ],
       ),
     );
-  }
-
-  _checkVerification() async {
-    bool isVerified =
-        await BackendRequester.isEmailVerified(parent.backendUser.userId);
-    if (isVerified) {
-      parent.setState(() {
-        parent.backendUser.emailVerified = true;
-      });
-    }
   }
 }

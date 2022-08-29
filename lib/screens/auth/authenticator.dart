@@ -69,9 +69,7 @@ class AuthenticatorState extends State<Authenticator> {
             backgroundColor: AppColors.background),
         home: Stack(children: [
           Card(
-              child: backendUser.providerGranted()
-                  ? TokenRequester(this).tokenWidget()
-                  : LoginScreen(this).loginWidget()),
+              child: TokenRequester(this).tokenWidget()),
           if (authenticationFailed)
             Padding(
               padding: const EdgeInsets.only(top:20),

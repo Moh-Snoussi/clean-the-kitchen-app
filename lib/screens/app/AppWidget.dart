@@ -150,7 +150,7 @@ class AppWidgetState extends State<AppWidget> {
 
   void setDropDown(String value) {
     setState(() {
-      dropDownVal = XiomiServer.us.toString();
+      dropDownVal = value;
     });
   }
 

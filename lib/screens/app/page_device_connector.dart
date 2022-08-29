@@ -64,6 +64,7 @@ Widget getDeviceConnectorPage(AppWidgetState parent) {
             ),
             DropdownButton<String>(
               hint: Text("Choose a server"),
+              value: parent.dropDownVal,
               itemHeight: 70,
               style: const TextStyle(color: Colors.deepPurple),
               isExpanded: true,
@@ -73,7 +74,8 @@ Widget getDeviceConnectorPage(AppWidgetState parent) {
               ),
               onChanged: (String newValue) {
                 parent.setDropDown(newValue);
-              },
+              }
+              ,
               items: XiomiServer.values
                   .map<DropdownMenuItem<String>>((dynamic value) {
                 return DropdownMenuItem<String>(
@@ -84,28 +86,33 @@ Widget getDeviceConnectorPage(AppWidgetState parent) {
             ),
             TextButton(
               onPressed: () async {
-                parent.setLoading(false);
-                parent.extractor = TokenExtractor(
-                    XiomiUser(
-                        username: parent.usernameController.value.text,
-                        password: parent.userpassController.value.text,
-                        server: XiomiServer.de),
-                    cacheDevices: true);
-                bool loginSuccess = await parent.extractor.login();
-                if (loginSuccess) {
-                  List<XiomiDevice> xiomidevices =
-                      await parent.extractor.geDevices();
-                  if (xiomidevices.length > 0) {
-                    Map body = await BackendRequester.registerDevices(
-                        xiomidevices, parent.user);
-                    if (body["success"]) {
-                      List<XiomiDevice> backendDevices =
-                          await BackendRequester.getDevices(parent.user);
-                      parent.setDevices(backendDevices);
+                parent.setLoading(true);
+                try {
+                  parent.extractor = TokenExtractor(
+                      XiomiUser(
+                          username: parent.usernameController.value.text,
+                          password: parent.userpassController.value.text,
+                          server: XiomiServer.values.firstWhere((element) => element.toString() == parent.dropDownVal)),
+                      cacheDevices: true);
+                  bool loginSuccess = await parent.extractor.login();
+                  if (loginSuccess) {
+                    List<XiomiDevice> xiomidevices =
+                        await parent.extractor.geDevices();
+                    if (xiomidevices.length > 0) {
+                      Map body = await BackendRequester.registerDevices(
+                          xiomidevices, parent.user);
+                      if (body["success"]) {
+                        List<XiomiDevice> backendDevices =
+                            await BackendRequester.getDevices(parent.user);
+                        parent.setDevices(backendDevices);
+                      }
                     }
                   }
+                } catch (e) {
+                  print(e.toString());
+                } finally {
+                  parent.setLoading(false);
                 }
-                parent.setLoading(false);
               },
               child: const Text('Submit'),
             )

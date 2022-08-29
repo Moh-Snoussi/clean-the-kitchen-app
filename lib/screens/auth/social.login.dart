@@ -67,6 +67,7 @@ class SocialLogin {
       await _loginWithAmazon.signIn();
     } catch (error) {
       parent.setErrorMessage(error.toString());
+      parent.setLoading(false);
     }
   }
 }
